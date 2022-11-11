@@ -3,32 +3,29 @@ import itertools as it
 
 class CYK:
     
-    def __init__(self, *args):
+    def __init__(self, grammar):
         self.__matrix = []
-        self.__grammar = args[0]
-        self.__my_string = args[1]
-        self.__initialize_matrix()
-    
-    def __initialize_matrix(self):
-        n = len(self.__my_string)
-        for i in range(0, n):
+        self.__grammar = grammar
+
+    def __initialize_matrix(self, string):
+        for i in string:
             self.__matrix.append([])
     
-    def __process_input(self):
-        self.__initial_step()
-        self.__iterate_matrix()
-    
-    def grammar_produces_string(self):
-        self.__process_input()
-        return 'S' in self.__matrix[0][len(self.__my_string)-1]
+    def grammar_produces_string(self, string:str):
+        n = len(string)
+        self.__initialize_matrix(string)
+        self.__initial_step(string)
+        self.__iterate_matrix(n)
+        return self.__grammar.initial_state in self.__matrix[0][n-1]
     
     @property
     def matrix(self):
         return self.__matrix
 
-    def __initial_step(self):
-        for i in range(0, len(self.__my_string)):
-            self.__matrix[i] += [self.__contains_production(self.__my_string[i])]
+    def __initial_step(self, string):
+        n = len(string)
+        for i in range(0, n):
+            self.__matrix[i] += [self.__contains_production(string[i])]
 
     def __contains_production(self, production):
         return [k for k, v in self.__grammar.productions.items() if production in v]
@@ -41,8 +38,7 @@ class CYK:
             except IndexError:
                 self.__matrix[i].append(self.__contains_production(str(a[0] + a[1])))
             
-    def __iterate_matrix(self):
-        n = len(self.__my_string)
+    def __iterate_matrix(self, n):
         for j in range(1, n):
             for i in range(0, n-j):
                 for k in range(0, j):

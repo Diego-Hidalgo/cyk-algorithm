@@ -1,9 +1,9 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-def createLabel(text: str, width: int, height: int, *args):
+def createLabel(name: str, text: str, width: int, height: int, *args):
     label = QtWidgets.QLabel()
-    # label.setObjectName(name)
+    label.setObjectName(name)
     label.setText(text)
     label.resize(width, height)
     if len(args) > 0:
@@ -15,11 +15,10 @@ def createLabel(text: str, width: int, height: int, *args):
     return label
 
 
-def createFont(size: int, bold: bool, weight: int, *args):
+def createFont(size: int, bold: bool, *args):
     font = QtGui.QFont()
     font.setPointSize(size)
     font.setBold(bold)
-    font.setWeight(weight)
     return font
 
 

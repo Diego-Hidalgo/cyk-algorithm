@@ -37,9 +37,6 @@ class AddGrammarView(AbstractView):
         self.__buildLeftFrame()
         self.__buildRightFrame()
         self.__buildBottomFrame()
-        print(self.leftFrame.height())
-        print(self.rightFrame.height())
-        print(self.bottomFrame.height())
 
     def changeView(self, view):
         centralWidget = QtWidgets.QWidget(self.parent)
@@ -66,8 +63,9 @@ class AddGrammarView(AbstractView):
         self.rightFrame.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.rightFrame.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.rightLayout = QtWidgets.QVBoxLayout()
-        self.rightLayout.setGeometry(QtCore.QRect(self.rightFrame.x(), self.rightFrame.y(), self.rightFrame.width()-20,
-                                                  self.rightFrame.height()))
+        self.rightLayout.setGeometry(
+            QtCore.QRect(self.rightFrame.x(), self.rightFrame.y(), self.rightFrame.width() - 20,
+                         self.rightFrame.height()))
         self.rightLayout.setObjectName("rightContainer")
         self.__buildRightFrameElements()
 
@@ -87,7 +85,23 @@ class AddGrammarView(AbstractView):
         label.setGeometry(QtCore.QRect(0, 0, 100, 45))
         label.setFont(createFont(18, True, label.width()))
         label.setAlignment(QtCore.Qt.AlignCenter)
+        layout = QtWidgets.QHBoxLayout()
+        layout.setObjectName("TerminalsLayout")
+        widgetTerminals = QtWidgets.QWidget()
+        labelTerminals = createLabel(("labelTerminals"), "Ingrese el alfabeto", 150, 70)
+        labelTerminals.setGeometry(QtCore.QRect(0, 0, 100, 45))
+        labelTerminals.setFont(createFont(10, True, labelTerminals.width()))
+        labelTerminals.setAlignment(QtCore.Qt.AlignCenter)
+        widgetTerminals.setObjectName("widgetTerminal")
+        terminalsInput = createTextField("terminals", 100, 30)
+        separatorInput = createTextField("separator", 70, 30)
+        separatorInput.setPlaceholderText("Separador")
+        layout.addWidget(labelTerminals)
+        layout.addWidget(terminalsInput)
+        layout.addWidget(separatorInput)
+        widgetTerminals.setLayout(layout)
         self.leftLayout.addWidget(label)
+        self.leftLayout.addWidget(widgetTerminals)
         widget.setLayout(self.leftLayout)
         self.leftFrame.setWidget(widget)
 
@@ -109,18 +123,17 @@ class AddGrammarView(AbstractView):
 
     def deleteVariableField(self):
         widgets = self.leftLayout.count()
-        if widgets > 1:
+        if widgets > 2:
             self.leftLayout.itemAt(widgets - 1).widget().deleteLater()
 
     def __buildRightFrameElements(self):
         widget = QtWidgets.QWidget()
         label = createLabel(("label4" + str(self.__quantityOfFields)), "Ingresa una produccion",
-                            self.rightFrame.width()-20, 70)
+                            self.rightFrame.width() - 20, 70)
         label.setGeometry(QtCore.QRect(0, 0, 100, 70))
         label.setFont(createFont(18, True, label.width()))
         label.setAlignment(QtCore.Qt.AlignCenter)
         productionInput = createTextField("productions", int(self.rightFrame.width() - 20), 50)
-        productionInput.setContentsMargins(20, 20, 20, 20)
         self.rightLayout.addWidget(label)
         self.rightLayout.addWidget(productionInput)
         widget.setLayout(self.rightLayout)

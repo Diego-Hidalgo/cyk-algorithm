@@ -12,6 +12,9 @@ class CYK:
             self.__matrix.append([])
     
     def grammar_produces_string(self, string:str):
+        for s in string:
+            if s not in self.__grammar.alphabet:
+                return False
         n = len(string)
         self.__initialize_matrix(string)
         self.__initial_step(string)

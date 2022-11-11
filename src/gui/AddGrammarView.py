@@ -17,6 +17,13 @@ def createContainer(layout):
     return container
 
 
+def checkSeparatorNotBelongToAlphabet(separator, string):
+    if separator in string:
+        return True
+    else:
+        return False
+
+
 class AddGrammarView(AbstractView):
     def __init__(self, parent: QtWidgets.QMainWindow):
         super().__init__(parent)
@@ -28,10 +35,11 @@ class AddGrammarView(AbstractView):
         self.bottomLayout: QtWidgets.QHBoxLayout()
         self.__lastFieldAdded = []
         self.__quantityOfFields = 0
-        self.variablesFields = []
+        self.variables = []
         self.terminals = []
-        self.production = None
-        self.message = "hola"
+        self.productions = None
+        self.separator = None
+        self.string = None
 
     def setupView(self):
         self.__buildLeftFrame()
@@ -128,7 +136,7 @@ class AddGrammarView(AbstractView):
 
     def __buildRightFrameElements(self):
         widget = QtWidgets.QWidget()
-        label = createLabel(("label4" + str(self.__quantityOfFields)), "Ingresa una produccion",
+        label = createLabel(("label4" + str(self.__quantityOfFields)), "Ingresa una cadena",
                             self.rightFrame.width() - 20, 70)
         label.setGeometry(QtCore.QRect(0, 0, 100, 70))
         label.setFont(createFont(18, True, label.width()))
@@ -158,4 +166,40 @@ class AddGrammarView(AbstractView):
         self.bottomFrame.setLayout(self.bottomLayout)
 
     def checkFields(self):
+        self.__checkTerminalsAndSeparator()
+        self.__checkVariablesAndProductions()
+        self.__checkString()
         self.parent.runCYKAlgorithmOnGrammar()
+
+    def __checkTerminalsAndSeparator(self):
+        alphabet = self.leftLayout.itemAt(1).widget().layout().itemAt(1).widget().toPlainText()
+        self.separator = self.leftLayout.itemAt(1).widget().layout().itemAt(2).widget().toPlainText()
+        if alphabet != "" and not alphabet.isspace() and self.separator != "" and not self.separator.isspace():
+            if checkSeparatorNotBelongToAlphabet(self.separator, alphabet):
+                self.terminals = alphabet.split(self.separator)
+            else:
+                raise RuntimeError
+        else:
+            raise RuntimeError
+
+    def __checkVariablesAndProductions(self):
+        variables = []
+        productions = []
+        everythingOk = True
+        for i in range(2, self.leftLayout.count()):
+            variable = self.leftLayout.itemAt(i).widget().layout().itemAt(0).widget().toPlainText()
+            production = self.leftLayout.itemAt(i).widget().layout().itemAt(1).widget().toPlainText()
+            if variable != "" and not variable.isspace() and production != "" and not production.isspace():
+                variables.append(variable)
+                productions.append(production)
+            else:
+                raise RuntimeError
+        self.variables = variables
+        self.productions = productions
+
+    def __checkString(self):
+        string = self.rightLayout.itemAt(1).widget().toPlainText()
+        if string != "" and not string.isspace():
+            self.string = string
+        else:
+            raise RuntimeError

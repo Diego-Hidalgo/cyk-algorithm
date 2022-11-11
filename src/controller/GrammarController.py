@@ -14,8 +14,16 @@ class GrammarController(QtWidgets.QMainWindow, MainWindow):
         self.changeView(self.addGrammarView)
 
     def runCYKAlgorithmOnGrammar(self):
-        pass
+        cyk = CYK(self.__setGrammar())
+        response = cyk.grammar_produces_string(self.addGrammarView.string)
 
     def __setGrammar(self):
         grammar = Grammar(self.addGrammarView.variables, self.addGrammarView.terminals)
         productions = self.addGrammarView.productions
+        for variable in grammar.states:
+            p = productions[variable].split("|")
+            for production in p:
+                try:
+                    grammar.add_production(variable, production)
+                except:
+                    print("a")

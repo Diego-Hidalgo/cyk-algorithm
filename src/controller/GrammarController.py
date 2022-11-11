@@ -10,3 +10,7 @@ class GrammarController(QtWidgets.QMainWindow, MainWindow):
         self.resultView = ResultView(self)
         self.setupUi(self)
         self.changeView(self.addGrammarView)
+
+    def runCYKAlgorithmOnGrammar(self):
+        print(self.addGrammarView.message)
+

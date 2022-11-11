@@ -29,11 +29,17 @@ class AddGrammarView(AbstractView):
         self.__lastFieldAdded = []
         self.__quantityOfFields = 0
         self.variablesFields = []
+        self.terminals = []
+        self.production = None
+        self.message = "hola"
 
     def setupView(self):
         self.__buildLeftFrame()
         self.__buildRightFrame()
         self.__buildBottomFrame()
+        print(self.leftFrame.height())
+        print(self.rightFrame.height())
+        print(self.bottomFrame.height())
 
     def changeView(self, view):
         centralWidget = QtWidgets.QWidget(self.parent)
@@ -45,7 +51,7 @@ class AddGrammarView(AbstractView):
         self.leftFrame = createScrollArea(self.parent.centralWidget, "leftFrame", int(self.parent.width() / 2),
                                           self.parent.height() - BOTTOM_FRAME_HEIGHT)
         configFrame(self.leftFrame, 0, 0)
-        self.leftFrame.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.leftFrame.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         self.leftFrame.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.leftLayout = QtWidgets.QVBoxLayout()
         self.leftLayout.setGeometry(QtCore.QRect(self.leftFrame.x(), self.leftFrame.y(), self.leftFrame.width(),
@@ -54,11 +60,13 @@ class AddGrammarView(AbstractView):
         self.__buildLeftFrameElements()
 
     def __buildRightFrame(self):
-        self.rightFrame = createFrame(self.parent.centralWidget, "rightFrame", int(self.parent.width() / 2),
-                                      self.parent.height() - BOTTOM_FRAME_HEIGHT)
-        configFrame(self.rightFrame, self.leftFrame.width() + 1, 0)
+        self.rightFrame = createScrollArea(self.parent.centralWidget, "rightFrame", int(self.parent.width() / 2),
+                                           self.parent.height() - BOTTOM_FRAME_HEIGHT)
+        configFrame(self.rightFrame, self.leftFrame.width(), 0)
+        self.rightFrame.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.rightFrame.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.rightLayout = QtWidgets.QVBoxLayout()
-        self.rightLayout.setGeometry(QtCore.QRect(self.rightFrame.x(), self.rightFrame.y(), self.rightFrame.width(),
+        self.rightLayout.setGeometry(QtCore.QRect(self.rightFrame.x(), self.rightFrame.y(), self.rightFrame.width()-20,
                                                   self.rightFrame.height()))
         self.rightLayout.setObjectName("rightContainer")
         self.__buildRightFrameElements()
@@ -67,7 +75,7 @@ class AddGrammarView(AbstractView):
         self.bottomFrame = createFrame(self.parent.centralWidget, "bottomFrame", self.parent.width(),
                                        BOTTOM_FRAME_HEIGHT)
         configFrame(self.bottomFrame, 0, self.leftFrame.height() + 1)
-        self.bottomLayout = QtWidgets.QVBoxLayout()
+        self.bottomLayout = QtWidgets.QHBoxLayout()
         self.bottomLayout.setGeometry(QtCore.QRect(self.bottomFrame.x(), self.bottomFrame.y(), self.bottomFrame.width(),
                                                    self.bottomFrame.height()))
         self.bottomLayout.setObjectName("bottomContainer")
@@ -105,12 +113,18 @@ class AddGrammarView(AbstractView):
             self.leftLayout.itemAt(widgets - 1).widget().deleteLater()
 
     def __buildRightFrameElements(self):
-        label = createLabel("rightTittle", "Ingresa una producción", self.rightFrame.width(), 70)
-        label.setGeometry(QtCore.QRect(self.rightFrame.x(), 0, self.rightFrame.width(), 70))
+        widget = QtWidgets.QWidget()
+        label = createLabel(("label4" + str(self.__quantityOfFields)), "Ingresa una produccion",
+                            self.rightFrame.width()-20, 70)
+        label.setGeometry(QtCore.QRect(0, 0, 100, 70))
         label.setFont(createFont(18, True, label.width()))
         label.setAlignment(QtCore.Qt.AlignCenter)
+        productionInput = createTextField("productions", int(self.rightFrame.width() - 20), 50)
+        productionInput.setContentsMargins(20, 20, 20, 20)
         self.rightLayout.addWidget(label)
-        self.rightFrame.setLayout(self.rightLayout)
+        self.rightLayout.addWidget(productionInput)
+        widget.setLayout(self.rightLayout)
+        self.rightFrame.setWidget(widget)
 
     def __buildBottomFrameElements(self):
         addBtn = createButton("addProduction", 145, 30)
@@ -121,6 +135,14 @@ class AddGrammarView(AbstractView):
         deleteBtn.setFont(createFont(10, True))
         deleteBtn.setText("Borrar campo")
         deleteBtn.clicked.connect(self.deleteVariableField)
+        cykBtn = createButton("cyk", 145, 30)
+        cykBtn.setFont(createFont(10, True))
+        cykBtn.setText("Aplicar algoritmo")
+        cykBtn.clicked.connect(self.checkFields)
         self.bottomLayout.addWidget(addBtn)
         self.bottomLayout.addWidget(deleteBtn)
+        self.bottomLayout.addWidget(cykBtn)
         self.bottomFrame.setLayout(self.bottomLayout)
+
+    def checkFields(self):
+        self.parent.runCYKAlgorithmOnGrammar()

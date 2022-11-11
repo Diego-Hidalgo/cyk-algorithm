@@ -187,15 +187,10 @@ class AddGrammarView(AbstractView):
         alphabet = self.leftLayout.itemAt(1).widget().layout().itemAt(1).widget().toPlainText()
         self.separator = self.leftLayout.itemAt(1).widget().layout().itemAt(2).widget().toPlainText()
         if alphabet != "" and not alphabet.isspace() and self.separator != "" and not self.separator.isspace():
-            if checkSeparatorNotBelongToAlphabet(self.separator, alphabet):
-                self.terminals = alphabet.split(self.separator)
-            else:
-                msgAlert("Llena todos los campos", "Error")
-                self.showResponse("El separador pertenece al alfabeto")
-                return False
+            self.terminals = alphabet.split(self.separator)
         else:
-            msgAlert("Llena todos los campos", "Error")
-            self.showResponse("Llena todos los campos")
+            msgAlert("Llena todos los campos", "error")
+            self.showResponse("error: Llena todos los campos")
             return False
 
         return True
@@ -210,7 +205,7 @@ class AddGrammarView(AbstractView):
                 variables.append(variable)
                 productions.append(production)
             else:
-                msgAlert("Llena todos los campos", "Error")
+                msgAlert("Llena todos los campos", "error")
                 self.showResponse("Llena todos los campos")
                 return False
         self.variables = variables
@@ -223,7 +218,7 @@ class AddGrammarView(AbstractView):
             self.string = string
             return True
         else:
-            msgAlert("Llena todos los campos", "Error")
+            msgAlert("Llena todos los campos", "error")
             self.showResponse("Llena todos los campos")
             return False
 

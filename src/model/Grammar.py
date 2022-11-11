@@ -1,3 +1,5 @@
+from src.error.error import *
+
 
 class Grammar:
     """

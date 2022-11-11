@@ -79,7 +79,7 @@ class Grammar:
     :param variable: must be an existent variable or state in the grammar. Specifies the variable that will contain the production.
     :param production: the production to add to the variable. Given that this class represents a grammar in Chomsky's normal form. the production must be a terminal or a binary production (A -> BC).
     """
-    def add_production_to_variable(self, variable:str, production:str):
+    def add_production(self, variable:str, production:str):
         if variable not in self.__productions:
             raise RuntimeError("La variable no existe en las variables definidas de la gramatica")
         if len(production) == 1 and production not in self.__alphabet:

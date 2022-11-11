@@ -24,6 +24,13 @@ def checkSeparatorNotBelongToAlphabet(separator, string):
         return False
 
 
+def msgAlert(msg, title):
+    box = QtWidgets.QMessageBox()
+    box.setText(msg)
+    box.setWindowTitle(title)
+    box.StandardButton(QtWidgets.QMessageBox.Ok)
+
+
 class AddGrammarView(AbstractView):
     def __init__(self, parent: QtWidgets.QMainWindow):
         super().__init__(parent)
@@ -40,6 +47,7 @@ class AddGrammarView(AbstractView):
         self.productions = None
         self.separator = None
         self.string = None
+        self.response = None
 
     def setupView(self):
         self.__buildLeftFrame()
@@ -142,8 +150,13 @@ class AddGrammarView(AbstractView):
         label.setFont(createFont(18, True, label.width()))
         label.setAlignment(QtCore.Qt.AlignCenter)
         productionInput = createTextField("productions", int(self.rightFrame.width() - 20), 50)
+        self.response = createLabel("response", "",
+                                    self.rightFrame.width() - 20, 70)
+        self.response.setGeometry(QtCore.QRect(0, 0, 100, 70))
+        self.response.setFont(createFont(10, True, label.width()))
         self.rightLayout.addWidget(label)
         self.rightLayout.addWidget(productionInput)
+        self.rightLayout.addWidget(self.response)
         widget.setLayout(self.rightLayout)
         self.rightFrame.setWidget(widget)
 
@@ -166,10 +179,9 @@ class AddGrammarView(AbstractView):
         self.bottomFrame.setLayout(self.bottomLayout)
 
     def checkFields(self):
-        self.__checkTerminalsAndSeparator()
-        self.__checkVariablesAndProductions()
-        self.__checkString()
-        self.parent.runCYKAlgorithmOnGrammar()
+        if self.__checkTerminalsAndSeparator() and self.__checkVariablesAndProductions() \
+                and self.__checkString():
+            self.parent.runCYKAlgorithmOnGrammar()
 
     def __checkTerminalsAndSeparator(self):
         alphabet = self.leftLayout.itemAt(1).widget().layout().itemAt(1).widget().toPlainText()
@@ -178,14 +190,19 @@ class AddGrammarView(AbstractView):
             if checkSeparatorNotBelongToAlphabet(self.separator, alphabet):
                 self.terminals = alphabet.split(self.separator)
             else:
-                raise RuntimeError
+                msgAlert("Llena todos los campos", "Error")
+                self.showResponse("El separador pertenece al alfabeto")
+                return False
         else:
-            raise RuntimeError
+            msgAlert("Llena todos los campos", "Error")
+            self.showResponse("Llena todos los campos")
+            return False
+
+        return True
 
     def __checkVariablesAndProductions(self):
         variables = []
         productions = []
-        everythingOk = True
         for i in range(2, self.leftLayout.count()):
             variable = self.leftLayout.itemAt(i).widget().layout().itemAt(0).widget().toPlainText()
             production = self.leftLayout.itemAt(i).widget().layout().itemAt(1).widget().toPlainText()
@@ -193,13 +210,22 @@ class AddGrammarView(AbstractView):
                 variables.append(variable)
                 productions.append(production)
             else:
-                raise RuntimeError
+                msgAlert("Llena todos los campos", "Error")
+                self.showResponse("Llena todos los campos")
+                return False
         self.variables = variables
         self.productions = productions
+        return True
 
     def __checkString(self):
         string = self.rightLayout.itemAt(1).widget().toPlainText()
         if string != "" and not string.isspace():
             self.string = string
+            return True
         else:
-            raise RuntimeError
+            msgAlert("Llena todos los campos", "Error")
+            self.showResponse("Llena todos los campos")
+            return False
+
+    def showResponse(self, msg):
+        self.response.setText(msg)
